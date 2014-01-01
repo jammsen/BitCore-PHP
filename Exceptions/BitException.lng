@@ -1,0 +1,10 @@
+[de] 
+    class_unknown                    = "Unbekannte Klasse '%s'."  
+    site_need_init                   = "Für diese Operation ist eine Initiallisierte Seiten Anwendung erfoderlich"
+    site_unavailable                 = "Site is unavailable at this time."
+    service_unavailable              = "Service '{0}' is unavailable at this time."
+[en]
+    class_unknown                    = "Unknown class '%s'."
+    site_need_init                   = "Für diese Operation ist eine Initiallisierte Seiten Anwendung erfoderlich"
+    site_unavailable                 = " Site is unavailable at this time."
+    service_unavailable              = "Service '{0}' is unavailable at this time."

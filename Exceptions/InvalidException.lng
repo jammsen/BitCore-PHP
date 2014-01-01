@@ -1,0 +1,11 @@
+[de]
+    bit_using = "'%s' ist kein gültiger Namensraum. Stell sicher das '.*' Angehängt ist, wenn du einen Namespace bezogen auf sein Verzeichnis verwenden möchtest."
+    bit_site_singelton = "Bit.Site muss nur einmal gesetzt werden."
+    no_actic_function  = "Diese funktion wurde deaktiviert. Nicht nötig zur Ausführung."
+    alias_path = "Alias '%s'  bezieht sich auf einen ungültigen Pfad '%s'. Nur vorhandene Verzeichnisse können als Alias gesetzt werden."
+[en]
+    bit_using = "'%s' is not a valid namespace to be used. Make sure '.*' is appended if you want to use a namespace referring to a directory."   
+    bit_site_singelton = "Bit.Site must only be set once."
+    no_actic_function  = "This function has been disabled. Not necessary to perform"
+    alias_path = "Alias '%s' refers to an invalid path '%s'. Only existing directories can be aliased."
+	
