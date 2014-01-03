@@ -14,5 +14,6 @@ Bit::setPathOfAlias('Pages', __DIR__.DS.'Pages');
 Bit::using('App.Lib.*');
 Bit::using('App.Helper.*');
 
+Bit::using('Bit.Site.Router.*');
+
 Bit::IncludeAll("App.Config.*");
-$site = new Site();

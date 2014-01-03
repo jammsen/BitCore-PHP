@@ -15,13 +15,13 @@
 error_reporting(E_ALL);
 
 define('ROOT', dirname(__FILE__));
-$frameworkPath = ROOT.'/../../Bit.php';
+define('BIT_CORE', ROOT.'/../../Bit.php');
 
-if (!is_file($frameworkPath))
-    die("Unable to find Bit framework path $frameworkPath.");
+if (!is_file(BIT_CORE))
+    die("Unable to find Bit framework path '".BIT_CORE."'.");
 
-require_once $frameworkPath;
-require_once ROOT.DS."/Init.php";
+require_once BIT_CORE;
+require_once ROOT.DS."Init.php";
 
 /**
  *Small Routes
@@ -34,7 +34,4 @@ Map::attachRoutes('/', array(
         'e404' => array('path' => '/404', 'namespace' => 'PIndex')
 )));
 
-if (!Bit::isSite())
-    throw new BitException('site_unavailable');
-
-$site->run();
+Site::run();

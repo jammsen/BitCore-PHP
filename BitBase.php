@@ -112,53 +112,55 @@ class BitBase {
     /**
      * PHP Run Level
      */
-    const RING_0 = 0x0;
+    const RING_0 = 0x0000;
 
     /**
      * Kernel Mode
      */
-    const RING_1 = 0x1;
+    const RING_1 = 0x0001;
 
     /**
      * Prepare Mode
      */
-    const RING_2 = 0x2;
+    const RING_2 = 0x0002;
 
     /**
      * Render Mode
      */
-    const RING_3 = 0x4;
+    const RING_3 = 0x0004;
 
     /**
      * Finish Mode
      */
-    const RING_4 = 0x8;
+    const RING_4 = 0x0008;
     
-    const RELEASE = 0x0;
-    const SIMPLE = 0x1;
-    const DEBUG = 0x2;
     /**
      * PHP-Runtime
      */
-    const MODE_0 = 0x0;
+    const MODE_0 = 0x0000;
     /**
      * Cli-Mode
      */
-    const MODE_1 = 0x0;
+    const MODE_1 = 0x0010;
     /**
      * Page-Mode
      */
-    const MODE_2 = 0x1;
+    const MODE_2 = 0x0020;
     /**
      * Custom Mode 1
      */
-    const MODE_3 = 0x2;
+    const MODE_3 = 0x0040;
     /**
      * Custom Mode 2
      */
-    const MODE_4 = 0x2;
+    const MODE_4 = 0x0080;
     
-    protected static $state = 0x0000;
+    
+    const RELEASE = 0x0000;
+    const SIMPLE = 0x1000;
+    const DEBUG = 0x2000;
+    
+    protected static $state = 0x2000;
 
     /**
      * @var array list of path aliases
@@ -226,7 +228,16 @@ class BitBase {
     public static function getSite() {
         return self::$_site;
     }
-
+    /**
+     * 
+     */
+    public static function setState($ring = null,$mode = null)
+    {
+        $r = is_null($ring) ? ((self::$state << 4) >> 4) : $ring;
+        $m = is_null($mode) ? ((self::$state >> 4) << 4) : $mode;
+        $d = ((self::$state >> 12) << 12);
+        self::$state = $r|$m|$d;
+    }
     /**
      * init the Base.
      * @param BSite $site the Site instance
@@ -241,9 +252,8 @@ class BitBase {
             return call_user_func_array(array('phpQuery', 'pq'), func_get_args());
         };
         self::initErrorHandlers();
-        BitHelper::SetByteValue(self::$state, 0, self::RING_0);
-        BitHelper::SetByteValue(self::$state, 1, self::MODE_2); //TODO
-        BitHelper::SetByteValue(self::$state, 2, self::DEBUG); //TODO    
+        self::setState(self::RING_1,self::MODE_2);
+          
         /**
          * Sets onShutdown handler to be BitBase::onShutdown
          */
@@ -287,8 +297,10 @@ class BitBase {
      * @param integer the line number the error was raised at
      */
     public static function phpErrorHandler($errno, $errstr, $errfile, $errline) {
+        var_dump(self::$state);
         if (error_reporting() & $errno) {
             if (self::$state & self::RING_1) {
+                
                 throw new PhpErrorException($errno, $errstr, $errfile, $errline);
             } else {
                 var_dump($errno, $errstr, $errfile, $errline);
@@ -308,6 +320,9 @@ class BitBase {
      * @param Exception exception that is not caught
      */
     static function exceptionHandler($exception) {
+        echo $exception->xdebug_message;
+        die();
+        var_dump($exception);
         if (self::$_site !== null) {
             self::$_site->doException($exception);
         } else {
