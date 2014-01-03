@@ -79,11 +79,57 @@ class Site extends BSite{
     }
 
     function doException(Exception $ex) {
-        if ($ex instanceof PageException)
+        if (!($ex instanceof BException))
             return;
-        var_dump($ex);
-        echo (isset($ex->xdebug_message)) ? $ex->xdebug_message : $ex;
-        exit(1);
+        
+        Bit::using('Bit.Exceptions.DocBlock.DocBlock');
+        
+        $js = Bit::$jQuery;
+        $doc = $ex->getTemplate();
+        
+        $content = $js('div#content'           ,$doc);
+        $js('<h1 class="border-left: 1px #fff dotted;">' . get_class($ex) . '</h1>')->appendTo($js('div.page-header-content',$doc));
+        
+        $trace = $ex->getTrace();
+        if (isset($trace[0]['class']))
+        {
+            $reflection = new ReflectionMethod($trace[0]['class'], $trace[0]['function']);
+            //$function =
+            $content->append('<h5 class="border-left: 1px #fff dotted;"><b>Function : ' . $trace[0]['class'] . $trace[0]['type'] . $trace[0]['function'] . '()</h5>');
+        }
+        elseif (isset($trace[0]['function']))
+        {
+            $reflection = new ReflectionFunction($trace[0]['function']);
+            $content->append('<h5 class="border-left: 1px #fff dotted;"><b>Function : ' . $trace[0]['function'] . '()</h5>');
+        }
+        $content->append('<h5 class="border-left: 1px #fff dotted;"><b>In File   : ' . $ex->getFile() . '@' . $ex->getLine() . '</h5>');
+               
+		if(isset($reflection) &&  $object = new DocBlock($reflection))
+        {
+            $content->append('<div class="docblock">'.$object.'</div>');
+            
+        }
+        
+        if ($ex instanceof PrintNiceException)
+            $content->append($ex->getErrorMessage());
+        else
+            $content->append($ex->getErrorMessage() . '');
+
+        if (isset($trace[0])) {
+            $content->append('<h2 class="border-left: 1px #fff dotted;"><b>Backtrace: ' . '</h3>');
+            $content->append('<ol id="trace"></ol>');
+            $ol = $js("ol#trace");
+            foreach ($trace as $value) {
+                if (isset($value['line'])) {
+                    if (isset($value['class']))
+                        $ol->append('<li>' . $value['class'] . $value['type'] . $value['function'] . '<br> <ul><li>in ' . (isset($value['file']) ? $value['file'] : __FILE__) . '@' . $value['line'] . '</li></ul></li>');
+                    else
+                        $ol->append('<li>' . $value['function'] . '<br> <ul><li>in ' . (isset($value['file']) ? $value['file'] : __FILE__) . '@' . $value['line'] . '</li></ul></li>');
+                }
+            }
+        }
+        
+        return $doc->htmlOuter();
     }
 
     function doFatalError(Exception $e) {

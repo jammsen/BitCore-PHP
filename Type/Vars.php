@@ -60,9 +60,6 @@ class Vars {
     public static function registerCall($key,$func,$filter = FILTER_CALLBACK,$opt = array()){
         self::$calls[$key] = [$func,$filter,$opt];
     }
-    public static function call($filter, $var, $options = null) {
-        return self::__tcall($filter, $var, $options);
-    }
     
     private static $callTable = array('session'=> '_SESSION','post'=>'_POST','get'=>'_GET','request'=>'_REQUEST','env'=>'_ENV','file'=>'_FILES','arg'=>'argv');
     

@@ -220,6 +220,7 @@ class BitBase {
         if (self::$_site !== null && !defined('BIT_TEST_RUN'))
             throw new InvalidException('bit_site_singelton');
         self::$_site = $site;
+        self::setState(self::RING_2,self::MODE_2);
     }
 
     /**
@@ -231,7 +232,7 @@ class BitBase {
     /**
      * 
      */
-    public static function setState($ring = null,$mode = null)
+    protected static function setState($ring = null,$mode = null)
     {
         $r = is_null($ring) ? ((self::$state << 4) >> 4) : $ring;
         $m = is_null($mode) ? ((self::$state >> 4) << 4) : $mode;
@@ -297,15 +298,13 @@ class BitBase {
      * @param integer the line number the error was raised at
      */
     public static function phpErrorHandler($errno, $errstr, $errfile, $errline) {
-        var_dump(self::$state);
         if (error_reporting() & $errno) {
-            if (self::$state & self::RING_1) {
-                
-                throw new PhpErrorException($errno, $errstr, $errfile, $errline);
-            } else {
+            if (!(self::$state)) {
                 var_dump($errno, $errstr, $errfile, $errline);
                 die('TODO: Ring 0');
             }
+            else
+                throw new PhpErrorException($errno, $errstr, $errfile, $errline);
         }
         return true;
     }
@@ -320,11 +319,9 @@ class BitBase {
      * @param Exception exception that is not caught
      */
     static function exceptionHandler($exception) {
-        echo $exception->xdebug_message;
-        die();
-        var_dump($exception);
         if (self::$_site !== null) {
-            self::$_site->doException($exception);
+            
+            echo self::$_site->doException($exception);
         } else {
             echo $exception;
         }

@@ -23,8 +23,7 @@ class PhpErrorException extends BitException {
      * @param integer error line number
      */
     public function __construct($errno, $errstr, $errfile, $errline) {
-        var_dump($errno, $errstr, $errfile, $errline);
-        die("1");
+        
         static $errorTypes = array(
             E_ERROR => "Error",
             E_WARNING => "Warning",

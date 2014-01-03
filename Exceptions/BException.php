@@ -126,8 +126,8 @@ abstract class BException extends Exception implements IException {
 
         echo '<h2>Debug Backtrace</h2>';
         echo '<pre>';
-        $index = -1;
-        foreach (debug_backtrace() as $t) {
+        $index = 0;
+        foreach ($this->getTrace() as $t) {
             $index++;
             if ($index == 0)// hide the backtrace of this function
                 continue;
