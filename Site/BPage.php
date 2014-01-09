@@ -1,7 +1,6 @@
 <?php
 
-
-abstract class Page extends Component implements IPage {
+abstract class BPage extends Component implements IPage {
 
     private $_viewport = null;
     private $_lessmethod = null;
@@ -120,6 +119,8 @@ abstract class Page extends Component implements IPage {
         }
     }
 
+    
+    
     function ViewError() {
         throw new ToDoException("Make a ViewError or a ViewIndex Handler You Idiot. Maybe Check your route");
     }

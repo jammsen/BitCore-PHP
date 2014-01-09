@@ -16,14 +16,14 @@
 Bit::using("Bit.Site.*");
 Bit::using("Bit.Site.Router.*");
 
-abstract class BSite implements ArrayAccess, ISite {
+abstract class BSite implements ISite {
 
     protected static $_loggedIn = false;
     protected static $_user = NULL;
     protected static $_modules = array();
 
     public static function setModule($namespace) {
-        
+        //self::$_modules = 
     }
 
     public static function getModule($namespace) {
@@ -35,25 +35,16 @@ abstract class BSite implements ArrayAccess, ISite {
     }
 
     protected $_data = array();
-
+    protected static $call = null;
+    
     function __construct() {
         BitBase::setSite($this);
+        self::$call = $this;
         $this->onInit();
     }
 
     function __destroy() {
         
-    }
-
-    function __set($name, $value) {
-        $this->_data[$name] = $value;
-    }
-
-    public function __get($name) {
-        if (isset($this->_data[$name]))
-            return $this->_data[$name];
-        else
-            return null;
     }
 
     public static function run() {
@@ -67,75 +58,74 @@ abstract class BSite implements ArrayAccess, ISite {
     }
 
     abstract public function onInit();
-
-    abstract public function doFatalError(Exception $e);
-
     abstract public function onRequest();
-
     abstract public function onDestroy();
-
-    abstract public function doException(Exception $e);
-
     abstract public function doLoadPage();
-
     abstract public function doRender();
+    
+    function doException(Exception $ex) {
+        if (!($ex instanceof BException))
+            return;
+        
+        Bit::using('Bit.Exceptions.DocBlock.DocBlock');
+        
+        $js = Bit::$jQuery;
+        $doc = $ex->getTemplate();
+        
+        $content = $js('div#content'           ,$doc);
+        $js('<h1 class="border-left: 1px #fff dotted;">' . get_class($ex) . '</h1>')->appendTo($js('div.page-header-content',$doc));
+        
+        $trace = $ex->getTrace();
+        if (isset($trace[0]['class']))
+        {
+            $reflection = new ReflectionMethod($trace[0]['class'], $trace[0]['function']);
+            //$function =
+            $content->append('<h5 class="border-left: 1px #fff dotted;"><b>Function : ' . $trace[0]['class'] . $trace[0]['type'] . $trace[0]['function'] . '()</h5>');
+        }
+        elseif (isset($trace[0]['function']))
+        {
+            $reflection = new ReflectionFunction($trace[0]['function']);
+            $content->append('<h5 class="border-left: 1px #fff dotted;"><b>Function : ' . $trace[0]['function'] . '()</h5>');
+        }
+        $content->append('<h5 class="border-left: 1px #fff dotted;"><b>In File   : ' . $ex->getFile() . '@' . $ex->getLine() . '</h5>');
+               
+	if(isset($reflection) &&  $object = new DocBlock($reflection))
+        {
+            $content->append('<div class="docblock">'.$object.'</div>');
+            
+        }
+        
+        if ($ex instanceof PrintNiceException)
+            $content->append($ex->getErrorMessage());
+        else
+            $content->append($ex->getErrorMessage() . '');
+
+        if (isset($trace[0])) {
+            $content->append('<h2 class="border-left: 1px #fff dotted;"><b>Backtrace: ' . '</h3>');
+            $content->append('<ol id="trace"></ol>');
+            $ol = $js("ol#trace");
+            foreach ($trace as $value) {
+                if (isset($value['line'])) {
+                    if (isset($value['class']))
+                        $ol->append('<li>' . $value['class'] . $value['type'] . $value['function'] . '<br> <ul><li>in ' . (isset($value['file']) ? $value['file'] : __FILE__) . '@' . $value['line'] . '</li></ul></li>');
+                    else
+                        $ol->append('<li>' . $value['function'] . '<br> <ul><li>in ' . (isset($value['file']) ? $value['file'] : __FILE__) . '@' . $value['line'] . '</li></ul></li>');
+                }
+            }
+        }
+        
+        return $doc->htmlOuter();
+    }
 
     /* Interface ArrayAccess */
 
     /**
-     * @param mixed the key
-     * @return boolean whether the request contains an item with the specified key
+     * @return Self 
      */
-    public function contains($key) {
-        return isset($this->_data[$key]) || array_key_exists($key, $this->_data);
+    public static function getSite(){
+        return self::$call;
     }
-
-    /**
-     * @return array the list of data in array
-     */
-    public function toArray() {
-        return $this->_data;
-    }
-
-    /**
-     * Returns whether there is an element at the specified offset.
-     * This method is required by the interface ArrayAccess.
-     * @param mixed the offset to check on
-     * @return boolean
-     */
-    public function offsetExists($offset) {
-        return $this->contains($offset);
-    }
-
-    /**
-     * Returns the element at the specified offset.
-     * This method is required by the interface ArrayAccess.
-     * @param integer the offset to retrieve element.
-     * @return mixed the element at the offset, null if no element is found at the offset
-     */
-    public function offsetGet($offset) {
-        return $this->_data[$offset];
-    }
-
-    /**
-     * Sets the element at the specified offset.
-     * This method is required by the interface ArrayAccess.
-     * @param integer the offset to set element
-     * @param mixed the element value
-     */
-    public function offsetSet($offset, $item) {
-        $this->_data[$offset] = $item;
-    }
-
-    /**
-     * Unsets the element at the specified offset.
-     * This method is required by the interface ArrayAccess.
-     * @param mixed the offset to unset element
-     */
-    public function offsetUnset($offset) {
-        unset($this->_data[$offset]);
-    }
-
+    
     /* Interface IConfig */
 
     protected static $_config = array();

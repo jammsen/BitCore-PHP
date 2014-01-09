@@ -9,19 +9,10 @@ class Site extends BSite{
     private $_page  = NULL;
     private $_cache = NULL;
     private $_speak = NULL;
-
     private $_states = NULL;
 
     function onInit() {
-        $protocol = (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == 'on') ? 'https://' : 'http://';
-        $host = $_SERVER["HTTP_HOST"];
-        $key = ($_SERVER['SERVER_SOFTWARE'] === 'nginx') ? 'REQUEST_URI' : 'REDIRECT_URL';
-        $uri = explode('?', isset($_SERVER[$key]) ? $_SERVER[$key] : '/');
-        $uri = array_shift($uri);
         
-        define('SITE_URI'     , $uri);
-        define('SITE_URI_HOST', $protocol.$host);
-        define('SITE_URI_FULL', SITE_URI_HOST.$uri);
     }
     /**
      * onDestroy()
@@ -35,31 +26,24 @@ class Site extends BSite{
     }
 
     function onRequest() {
-        
     }
 
     /**
      * doLoadPage()
      * called by $this->run();
-     *
-     * Found Route From Redirect
-     *
      * XXX subPath
      */
     function doLoadPage() {
-        $this->_route = Map::matchRoute(SITE_URI, $_SERVER, 'm_e404');
-
-        if (!$this->_route)
-            throw new RouteNotFound('');
+        $this->_route = ["namespace"=>Vars::get_getstring('page'),"values"=>['view'=>Vars::get_getstring('view')]];
     }
 
     /**
      * doRender()
      */
     function doRender() {
-        Bit::using("Pages." . $this->_route['namespace'], false);
+        Bit::using("Pages." . $this->_route['namespace'] , false);
 
-        $_class_name = Bit::getClassOfNamespace($this->_route['namespace'], false);
+        $_class_name = Bit::getClassOfNamespace(Vars::get_getstring('page'), false);
         if ($_class_name) {
             $page_class = new $_class_name($this);
             $wrapper = $page_class->getWrapper();
@@ -80,9 +64,6 @@ class Site extends BSite{
         return $this->_route;
     }
 
-    public function getRoot() {
-        return $this;
-    }
     /**
      * @return PDO
      */

@@ -12,7 +12,7 @@
  * @package     Site/BComponent
  * @category    Site
  */
-abstract class BComponent implements ICompomnent, BLessPHP, IDatabaseHolder {
+abstract class BComponent implements ArrayAccess,ICompomnent, BLessPHP, IDatabaseHolder {
 
     CONST AUTO = TRUE;
     CONST TYPE = 'void';
@@ -389,8 +389,55 @@ abstract class BComponent implements ICompomnent, BLessPHP, IDatabaseHolder {
         $t->Render();
     }
     
-    public function getSite(){
+    public static function getSite(){
         throw new ToDoException('Hmm');
+    }
+    
+    
+    /**
+     * @return array the list of data in array
+     */
+    public function toArray() {
+        return [];
+    }
+
+    /**
+     * Returns whether there is an element at the specified offset.
+     * This method is required by the interface ArrayAccess.
+     * @param mixed the offset to check on
+     * @return boolean
+     */
+    public function offsetExists($offset) {
+        return true;
+    }
+
+    /**
+     * Returns the element at the specified offset.
+     * This method is required by the interface ArrayAccess.
+     * @param integer the offset to retrieve element.
+     * @return mixed the element at the offset, null if no element is found at the offset
+     */
+    public function offsetGet($offset) {
+        return pq($offset,$this->_page);
+    }
+
+    /**
+     * Sets the element at the specified offset.
+     * This method is required by the interface ArrayAccess.
+     * @param integer the offset to set element
+     * @param mixed the element value
+     */
+    public function offsetSet($offset, $item) {
+        pq($offset,$this->_page)->html = $item;
+    }
+
+    /**
+     * Unsets the element at the specified offset.
+     * This method is required by the interface ArrayAccess.
+     * @param mixed the offset to unset element
+     */
+    public function offsetUnset($offset) {
+        pq($offset,$this->_page)->remove();
     }
     
 }

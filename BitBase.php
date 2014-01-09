@@ -182,11 +182,6 @@ class BitBase {
     private static $_site = null;
 
     /**
-     * @var BPage the Page instance need by Exception? 
-     */
-    private static $_page = null;
-
-    /**
      * @return string the version of Bit framework
      */
     public static function getVersion() {
@@ -229,6 +224,7 @@ class BitBase {
     public static function getSite() {
         return self::$_site;
     }
+    
     /**
      * 
      */

@@ -85,9 +85,7 @@ interface ICompomnent {
 
     public function getRoute();
 
-    public function getRoot();
-
-    public function getSite();
+    public static function getSite();
 }
 
 interface IPage {
@@ -95,9 +93,9 @@ interface IPage {
 }
 
 interface IModule extends IConfig {
-
-    public function __construct(ISite &$site);
+    function _init();
 }
+
 
 interface IClass extends IConfigurabel {
     

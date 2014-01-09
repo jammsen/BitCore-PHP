@@ -120,7 +120,7 @@ class BDatabase extends PDO implements IDatabase {
         return parent::prepare($statement, $driver_options);
     }
     /**
-     * @see parent::prepare()
+     * @see parent::query()
      */
     public function query($statement) {
         if (!$this->_connect)

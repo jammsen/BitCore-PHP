@@ -399,7 +399,7 @@ class DOMDocumentWrapper {
 			}
 		} else {
 			return preg_replace(
-				'@<head(.*?)(?(?<!\?)>)@s',
+				'@<head\s(?(?<!\?)>)@s',
 				'<head\\1>'.$meta,
 				$html
 			);
